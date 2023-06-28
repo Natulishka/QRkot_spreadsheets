@@ -1,4 +1,5 @@
-from typing import Dict, List
+from datetime import datetime
+from typing import Dict, List, Union
 
 from aiogoogle import Aiogoogle
 from fastapi import APIRouter, Depends
@@ -16,7 +17,7 @@ router = APIRouter()
 
 @router.post(
     '/',
-    response_model=List[Dict[str, str]],
+    response_model=List[Dict[str, Union[str, datetime]]],
     dependencies=[Depends(current_superuser)],
 )
 async def get_report(
@@ -24,7 +25,9 @@ async def get_report(
         wrapper_services: Aiogoogle = Depends(get_service)
 
 ):
-    """Только для суперюзеров."""
+    '''Только для суперюзеров. \n
+    Формирует отчет с закрытыми проектами, отсортированными
+    по скорости сбора средств.'''
     projects = await charity_project_crud.get_projects_by_completion_rate(
         session)
     spreadsheetid = await spreadsheets_create(wrapper_services)

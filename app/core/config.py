@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     version: str = '0.1.0'
     database_url: str = 'sqlite+aiosqlite:///./fastapi.db'
     secret: str = '123456'
+    lifetime_seconds: int = 3600
     first_superuser_email: Optional[EmailStr] = None
     first_superuser_password: Optional[str] = None
     type: Optional[str] = None

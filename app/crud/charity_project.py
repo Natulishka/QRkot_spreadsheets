@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 from sqlalchemy import desc, func, select
@@ -25,22 +25,17 @@ class CRUDCharityProject(CRUDBase):
     async def get_projects_by_completion_rate(
             self,
             session: AsyncSession,
-    ) -> List[Dict[str, Union[str, timedelta]]]:
+    ) -> List[Dict[str, Union[str, datetime]]]:
         projects = await session.execute(
-            select(CharityProject).where(
+            select([CharityProject.name,
+                    CharityProject.close_date,
+                    CharityProject.create_date,
+                    CharityProject.description]).where(
                 CharityProject.fully_invested).order_by(
                     desc(func.julianday(CharityProject.close_date) -
                          func.julianday(CharityProject.create_date)))
         )
-        projects = projects.scalars().all()
-        report_projects = []
-        for project in projects:
-            report_projects.append({
-                'name': project.name,
-                'donations time': str(project.close_date - project.create_date),
-                'description': project.description,
-            })
-        return report_projects
+        return projects.all()
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)
